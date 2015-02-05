@@ -1,6 +1,6 @@
 <?php
 /**
- * actions on an individual site
+ * Actions on an individual site
  *
  */
 
