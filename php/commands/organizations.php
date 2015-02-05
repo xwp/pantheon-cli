@@ -1,4 +1,7 @@
 <?php
+/**
+ * Manage organizations
+ */
 use \Terminus\User;
 use \Terminus\Utils;
 use \Terminus\Auth;

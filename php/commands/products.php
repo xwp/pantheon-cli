@@ -1,4 +1,7 @@
 <?php
+/**
+ * List products
+ */
 use \Terminus\Products;
 
 class Products_Command extends Terminus_Command {
