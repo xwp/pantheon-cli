@@ -20,12 +20,11 @@ class EnvironmentWorkflow extends Workflow {
     $data = array();
     $path = sprintf('environments/%s/workflows', $this->object->name);
     if ('POST' == $this->getMethod()) {
-      $data['body'] = json_encode(
-        array(
-          'type' => $this->type,
-          'params' => $this->params
-        )
-      );
+      $data['body'][ 'type'] = $this->type;
+      if (!empty($this->params)) {
+         $data['body']['params'] = $this->params;
+      }
+      $data['body'] = json_encode($data['body']);
       $data['headers'] = array('Content-type'=>'application/json');
     } else {
       $path = "$path?type=".$this->type;

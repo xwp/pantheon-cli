@@ -101,8 +101,15 @@ class Sites_Command extends Terminus_Command {
     $workflow = Workflow::createWorkflow('create_site','users', new User());
     $workflow->setMethod('POST');
     $workflow->setParams($data);
-    $workflow->start()->wait();
-
+    $workflow->start();
+    while( $workflow->status('result') != 'completed' ) {
+      $workflow->refresh();
+      $details = $workflow->status();
+      if ($details->params->site_id) {
+         echo $this->coloredOutput('<G>New site %s created with UUID %s</G>', array( $workflow->params->site_name, $workflow->params->site_id)); 
+      //echo $workflow->status('description') .'...'. $workflow->status('active_description') .PHP_EOL;
+      }
+    }
     Terminus::success("Pow! You created a new site!");
     $this->cache->flush(null,'session');
 

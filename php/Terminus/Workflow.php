@@ -65,7 +65,6 @@ class Workflow {
     }
 
     $response = \Terminus_Command::request($this->realm, $this->object->getId(), $path, $this->getMethod(), $data);
-
     if (is_object($response['data'])) {
       $this->status = $response['data'];
       $this->id = $this->status->id;

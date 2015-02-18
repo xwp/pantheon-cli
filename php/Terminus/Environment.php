@@ -283,4 +283,69 @@ class Environment {
     );
     return $return_data;
   }
+
+  /**
+   * Check whether the environment has code or not
+   */
+  public function hasCode() {
+    $refs = (array) $this->site->tips();
+    $key = "dev" == $this->name ? "master" : $this->name;
+    if (array_key_exists($key, $refs)) {
+      return true;
+    }
+    return false;
+  }
+
+  /** 
+   * Do an initial deploy of an environment
+  */
+  public function initialize() {
+    $from_env = "live" === $this->name ? 'tests' : 'dev';
+    $this->syncCode();
+    $this->converge();
+    $this->cloneFiles($from_env);
+    $this->cloneDb($from_env);
+  }
+
+  public function cloneFiles($from_env) {
+    $workflow = new EnvironmentWorkflow('clone_files', 'sites', $this);
+    \Terminus::line('Cloning files ');
+    $workflow->setParams(array(
+        'from_environment' => $from_env,
+    ));
+    $workflow->setMethod('POST');
+    $workflow->start()->wait();
+    return $workflow->status();
+  }
+
+  public function cloneDb($from_env) {
+    $workflow = new EnvironmentWorkflow('clone_database', 'sites', $this);
+    $workflow->setParams(array(
+        'from_environment' => $from_env,
+        'clear_cache' => false,
+        'updatedb' => 0,
+    ));
+    $workflow->setMethod('POST');
+    \Terminus::line('Cloning database ');
+    $workflow->start()->wait();
+    return $workflow->status();
+  }
+
+  public function syncCode() {
+    \Terminus::line("Syncing code ...");
+    $path = sprintf('environments/%s/workflows', $this->name );
+    $workflow = new EnvironmentWorkflow('sync_code','sites',$this);
+    $workflow->setMethod('POST');
+    $workflow->start()->wait();
+    return $workflow->status();
+  } 
+  
+  public function converge() {
+    \Terminus::line("Converging code ...");
+    $path = sprintf('environments/%s/workflows', $this->name );
+    $workflow = new EnvironmentWorkflow('converge_environment','sites',$this);
+    $workflow->setMethod('POST');
+    $workflow->start()->wait();
+    return $workflow->status();
+  } 
 }

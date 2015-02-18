@@ -546,17 +546,17 @@ class Site_Command extends Terminus_Command {
      \Terminus::confirm($confirm);
 
       if ( !$this->envExists($site_id, $to_env) ) {
-        \Terminus::error("The %s environment has not been created yet. run `terminus site create-env [--site=<env>]`", $to_env);
+        \Terminus::error("The %s environment has not been created yet. run `terminus site deploy --site=%s --env=%s`", array($to_env, $site->getName(), $to_env));
       }
 
      if ($db) {
        print "Cloning database ... ";
-       $this->cloneObject( $to_env, $from_env, $site_id, 'database');
+       $site->environment($to_env)->cloneDb($from_env);
      }
 
      if ($files) {
       print "Cloning files ... ";
-      $this->cloneObject( $to_env, $from_env, $site_id, 'files');
+      $site->environment($to_env)->cloneFiles($from_env);
      }
      \Terminus::success("Clone complete!");
      return true;
@@ -667,6 +667,10 @@ class Site_Command extends Terminus_Command {
      $site = SiteFactory::instance( Input::site( $assoc_args ) );
      $env = Input::env($assoc_args);
      $from = Input::env($assoc_args, 'from', "Choose environment you want to deploy from");
+      if ( !$site->environment($env)->hasCode() ) {
+        Terminus::line("This site has never been deployed before so we're going to sync from $from"); 
+        $site->environment($env)->initialize();
+     }
      if (!isset($assoc_args['note'])) {
        $note = Terminus::prompt("Custom note for the Deploy Log", array(), "Deploy from Terminus 2.0");
      } else {

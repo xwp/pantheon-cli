@@ -27,17 +27,14 @@ class Deploy {
   }
 
   public function run() {
-    $params = array(
-      'type' => 'deploy',
-      'params' => array(
+    $workflow = new EnvironmentWorkflow('deploy','sites',$this->env);
+    $workflow->setMethod('POST');
+    $workflow->setParams(array(
         'annotation' => $this->annotation,
         'clear_cache' => $this->cc,
         'updatedb' => $this->updatedb,
-      ),
-    );
-    $options = array( 'body' => json_encode($params) , 'headers'=>array('Content-type'=>'application/json') );
-    $path = sprintf("environments/%s/workflows/deploy", $this->env->name);
-    $response = \Terminus_Command::request( 'sites', $this->env->site->getId(), $path, 'POST', $options);
-    return $response['data'];
+    ));
+    $workflow->start()->wait();
+    return $workflow->status(); 
   }
 }
