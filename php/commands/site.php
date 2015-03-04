@@ -405,6 +405,8 @@ class Site_Command extends Terminus_Command {
          // build a menu for selecting back ups
          foreach( $backups as $folder => $backup ) {
            if (!isset($backup->filename)) continue;
+           if (0 !== strpos($backup->filename, sprintf("%s_%s", $site->getName(), $env))) continue;
+           if (!isset($backup->size)) continue;
            if (!isset($backup->folder)) $backup->folder = $folder;
            $buckets[] = $backup->folder;
            $menu[] = $backup->filename;
@@ -498,6 +500,7 @@ class Site_Command extends Terminus_Command {
         $data = array();
         foreach ($backups as $id => $backup) {
           if (!isset($backup->filename)) continue;
+          if (!isset($backup->size)) continue;
           $date = 'Pending';
           if (isset($backup->finish_time)) {
             $date = date("Y-m-d H:i:s", $backup->finish_time);

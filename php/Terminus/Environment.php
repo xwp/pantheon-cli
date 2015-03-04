@@ -117,6 +117,7 @@ class Environment {
         }
       }
     }
+    
     if ($latest_only) {
       return array(array_pop($backups));
     }
