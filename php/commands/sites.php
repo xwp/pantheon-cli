@@ -105,7 +105,11 @@ class Sites_Command extends Terminus_Command {
     $workflow->refresh();
     $details = $workflow->status();
     if ($details->result !== 'failed' AND $details->result !== 'aborted') {
+<<<<<<< HEAD
       echo Terminus\Loggers\Regular::coloredOutput('%G'.vsprintf('New "site" %s created with "UUID" %s', array($details->waiting_for_task->params->site_name, $details->waiting_for_task->params->site_id))); 
+=======
+      Terminus\Loggers\Regular::coloredOutput('%G'.vsprintf('New "site" %s now building with "UUID" %s', array($details->waiting_for_task->params->site_name, $details->waiting_for_task->params->site_id))); 
+>>>>>>> master
     }
     $workflow->wait();
     Terminus::success("Pow! You created a new site!");

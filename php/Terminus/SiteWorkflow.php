@@ -49,9 +49,9 @@ class SiteWorkflow {
       $path = "$path?type=".$this->type;
     }
     $response = \Terminus_Command::request('sites', $this->site->getId(), $path, $method, $data);
-   
+    
     if (!\Terminus\utils\result_is_multiobj($response['data'])) {
-      $response['data'] = array( $response['data'] );
+      $response['data'] = array($response['data']);
     }
     
     $this->status = $response['data'][0];

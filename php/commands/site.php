@@ -223,9 +223,6 @@ class Site_Command extends Terminus_Command {
         Terminus::success("Successfully changed connection mode to $mode");
         break;
     }
-    if(!empty($data)) {
-      $this->handleDisplay($data, array(), $headers);
-    }
     return $data;
   }
 
@@ -237,13 +234,35 @@ class Site_Command extends Terminus_Command {
    * [--site=<site>]
    * : site dashboard to open
    *
+   * [--env=<env>]
+   * : site environment to display in the dashboard
+   *
+   * [--print]
+   * : don't try to open the link, just print it
+   *
    * @subcommand dashboard
   */
   public function dashboard($args, $assoc_args) {
+    switch ( php_uname('s') ) {
+      case "Linux":
+        $cmd = "xdg-open"; break;
+      case "Darwin":
+        $cmd = "open"; break;
+      case "Windows NT":
+        $cmd = "start"; break;
+    }
     $site = SiteFactory::instance(Input::site($assoc_args));
-    Terminus::confirm("Do you want to open your dashboard link in a web browser?", Terminus::get_config());
-    $command = sprintf("open 'https://dashboard.getpantheon.com/sites/%s'", $site->getId());
-    exec($command);
+    $env = Input::optional( 'env', $assoc_args );
+    $env = $env ? sprintf( "#%s", $env ) : null;
+    $url = sprintf("https://dashboard.getpantheon.com/sites/%s%s", $site->getId(), $env);
+    if ( isset($assoc_args['print']) ) {
+      Logger::coloredOutput("%GDashboard URL:%n " . $url);
+    }
+    else {
+      Terminus::confirm("Do you want to open your dashboard link in a web browser?", Terminus::get_config());
+      $command = sprintf("%s %s", $cmd, $url);
+      exec($command);
+    }
   }
 
   /**
@@ -316,14 +335,14 @@ class Site_Command extends Terminus_Command {
           $orgs = $site->memberships();
           break;
     }
-    if (empty($data)) {
+    if (empty($orgs)) {
       Terminus::error("No organizations");
     }
-
+    
     // format the data
     foreach ($orgs as $org) {
       $data[] = array(
-        'label' => "'{$org->organization->profile->name}'",
+        'label' => "{$org->organization->profile->name}",
         'name'  => $org->organization->profile->machine_name,
         'role'  => $org->role,
         'id' => $org->organization_id,
@@ -479,10 +498,14 @@ class Site_Command extends Terminus_Command {
         $data = array();
         foreach ($backups as $id => $backup) {
           if (!isset($backup->filename)) continue;
+          $date = 'Pending';
+          if (isset($backup->finish_time)) {
+            $date = date("Y-m-d H:i:s", $backup->finish_time);
+          } 
           $data[] = array(
             $backup->filename,
             sprintf("%dMB", $backup->size / 1024 / 1024),
-            date("Y-m-d H:i:s", $backup->finish_time),
+            $date,
           );
         }
 
@@ -562,23 +585,6 @@ class Site_Command extends Terminus_Command {
      return true;
    }
 
-
-   // @todo this should be moved to a namespaced class CloneResource
-   private function cloneObject($to_env, $from_env, $site_id, $object_type) {
-     $path = sprintf("environments/%s/%s", $to_env, $object_type);
-
-     $data = array('clone-from-environment'=>$from_env);
-     $OPTIONS = array(
-       'body' => json_encode($data) ,
-       'headers'=> array('Content-type'=>'application/json')
-     );
-     $response = \Terminus_Command::request("sites", $site_id, $path, "POST", $OPTIONS);
-     if ($response) {
-       $this->waitOnWorkflow("sites", $site_id, $response['data']->id);
-       return $response;
-     }
-     return false;
-   }
 
   /**
    * Create a MultiDev environment
@@ -1212,7 +1218,7 @@ class Site_Command extends Terminus_Command {
      if(isset($upstream->remote_url) && isset($upstream->behind)) {
        // The $upstream object returns a value of [behind] -> 1 if there is an
        // upstream update that has not been applied to Dev.
-       $data[$upstream->remote_url] = ($upstream->behind == 1 ? "Updates Available":"Up-to-date");
+       $data[$upstream->remote_url] = ($upstream->behind > 0 ? "Updates Available":"Up-to-date");
 
        $this->_constructTableForResponse($data, array('Upstream','Status') );
        if (!isset($upstream) OR empty($upstream->update_log)) Terminus::success("No updates to show");
