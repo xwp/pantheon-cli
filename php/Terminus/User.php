@@ -50,7 +50,7 @@ class User {
 
   public function organizations() {
     if (!$this->organizations) {
-      $path = 'organizations';
+      $path = 'memberships/organizations';
       $method = "GET";
       $response = \Terminus_Command::request('users', $this->id, $path, $method);
       $this->organizations = $response['data'];

@@ -23,13 +23,13 @@ class Organizations_Command extends Terminus_Command {
   public function all($args, $assoc_args) {
      $user = new User();
      $data = array();
-     foreach ( $user->organizations() as $org_id => $org) {
+     foreach ( $user->organizations() as $org) {
        $data[] = array(
-         'name' => $org->name,
-         'id' => $org_id,
+         'name' => $org->organization->profile->name,
+         'machine name' => $org->organization->profile->machine_name,
+         'id' => $org->id,
        );
      }
-
      $this->handleDisplay($data);
   }
 
