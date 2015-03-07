@@ -49,9 +49,9 @@ class Input {
 
   public static function orglist($site=null) {
     $orgs = array('-'=>'None');
-    $user = new User;
-    foreach ($user->organizations() as $id => $org) {
-      $orgs[$id] = $org->name;
+    $user = new User();
+    foreach ($user->organizations() as $org) {
+      $orgs[$org->id] = $org->organization->profile->name;
     }
     return $orgs;
   }

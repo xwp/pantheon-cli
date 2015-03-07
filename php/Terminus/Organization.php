@@ -6,12 +6,21 @@ use Terminus\Site;
 
 class Organization {
 
-  public function __construct( $org ) {
+  public function __construct( $id_or_name ) {
     // if the org id is passed in then we need to fetch it from the user object
-    if (is_string($org)) {
+    if (is_string($id_or_name)) {
       $user = User::instance();
       $orgs = $user->organizations();
-      $org = $orgs->$org;
+      foreach($orgs as $test) {
+        if($test->id === $id_or_name || $test->organization->profile->name === $id_or_name) {
+          $org = $test;
+          break;
+        }
+      }
+    }
+
+    if (!isset($org)) {
+      throw new \Terminus\Iterators\Exception("Could not find organization $id_or_name");
     }
 
     // hydrate the object

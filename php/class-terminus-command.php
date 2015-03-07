@@ -120,6 +120,7 @@ abstract class Terminus_Command {
 
       // combine session realm uuid and path to get a unique key
       // @todo need cache "groups"
+      // echo $uuid.$realm.$path.PHP_EOL;
       $cachekey = md5( Session::getValue('user_uuid').$uuid.$realm.$path );
       $data = $cache->get_data($cachekey);
 

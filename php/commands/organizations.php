@@ -23,7 +23,7 @@ class Organizations_Command extends Terminus_Command {
   public function all($args, $assoc_args) {
      $user = new User();
      $data = array();
-     foreach ( $user->organizations() as $org) {
+     foreach ($user->organizations() as $org) {
        $data[] = array(
          'name' => $org->organization->profile->name,
          'machine name' => $org->organization->profile->machine_name,
@@ -54,17 +54,7 @@ class Organizations_Command extends Terminus_Command {
     $orgs = array();
     $user = new User();
 
-    foreach ($user->organizations() as $id => $org) {
-      $orgs[$id] = $org->name;
-    }
-
-    if (!isset($assoc_args['org']) OR empty($assoc_args['org'])) {
-      $selected_org = Terminus::menu($orgs,false,"Choose an organization");
-    } else {
-      $selected_org = $assoc_args['org'];
-    }
-
-    $org = new Organization($selected_org);
+    $org = new Organization(Input::orgid($assoc_args,'org'));
 
     if (isset($assoc_args['add'])) {
         $add = SiteFactory::instance(Input::site($assoc_args,'add'));
