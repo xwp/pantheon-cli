@@ -447,7 +447,8 @@ class Terminus {
       $url = "https://api.github.com/repos/pantheon-systems/cli/releases?per_page=1";
       $response = Request::send($url,'GET');   
       $json = $response->getBody(TRUE);
-      $release = array_shift(json_decode($json));
+      $json = json_decode($json);
+      $release = array_shift($json);
       $cache->put_data(__FUNCTION__,$release);
     }
     return $release->tag_name;
