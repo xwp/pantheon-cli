@@ -121,8 +121,12 @@ class Site {
    */
   public function info($key = null) {
     $info = $this->information;
-    if ($key AND property_exists($info, $key)) {
+    if ($key && property_exists($info, $key)) {
       return $info->$key;
+    }
+    if ($key && !property_exists($info, $key)) {
+      // Asking for info on a key that is not found.
+      return null;
     }
     return $this->information;
   }
