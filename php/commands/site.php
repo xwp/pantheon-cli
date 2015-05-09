@@ -644,7 +644,10 @@ class Site_Command extends Terminus_Command {
    * : Site to use
    *
    * [--env=<env>]
-   * : name of environment to delete
+   * : Name of environment to delete
+   *
+   * [--yes]
+   * : No confirmation; just do it!
    *
    * @subcommand delete-env
    */
@@ -654,7 +657,9 @@ class Site_Command extends Terminus_Command {
      $multidev_envs = array_diff($site->availableEnvironments(), array('dev', 'test', 'live'));
      $env = Input::env($assoc_args, 'env', "Environment to delete", $multidev_envs);
 
-     Terminus::confirm("Are you sure you want to delete the '$env' environment from {$site->getName()}");
+     if (!isset($assoc_args['yes'])) {
+        Terminus::confirm("Are you sure you want to delete the '$env' environment from {$site->getName()}");
+     }
 
      $workflow = $site->deleteEnvironment($env);
      $workflow->wait();
