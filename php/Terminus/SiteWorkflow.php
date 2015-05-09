@@ -51,6 +51,7 @@ class SiteWorkflow {
     $response = \Terminus_Command::request('sites', $this->site->getId(), $path, $method, $data);
     
     if (!\Terminus\utils\result_is_multiobj($response['data'])) {
+      echo "\n\nCOERCING INTO ARRAY\n\n";
       $response['data'] = array($response['data']);
     }
     var_dump($response);
