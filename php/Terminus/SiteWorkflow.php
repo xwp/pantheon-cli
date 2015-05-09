@@ -50,11 +50,11 @@ class SiteWorkflow {
     }
     $response = \Terminus_Command::request('sites', $this->site->getId(), $path, $method, $data);
     
-    if (!\Terminus\utils\result_is_multiobj($response['data']) || isset($response['data'])) {
+    if (!\Terminus\utils\result_is_multiobj($response['data']) || 
+        (isset($response['data']) && isset($response['data']->id))) {
       $response['data'] = array($response['data']);
-      echo "Coercing into an array. Why do we do this?\n\n";
+      echo "Coercing into an array.\n\n";
     }
-    print_r($response);
     $this->status = $response['data'][0];
     $this->id = $response['data'][0]->id;
     $this->result = $response['data'][0]->result;
@@ -64,8 +64,10 @@ class SiteWorkflow {
   public function refresh() {
     $response = \Terminus_Command::request('sites', $this->site->getId(), "workflows/".$this->id, 'GET');
     // we have to do this because the api sometimes returns an object and sometimes a collections
-    if (!\Terminus\utils\result_is_multiobj($response['data'])  || isset($response['data'])) {
+    if (!\Terminus\utils\result_is_multiobj($response['data']) || 
+        (isset($response['data']) && isset($response['data']->id))) {
       $response['data'] = array( $response['data'] );
+      echo "Coercing into an array.\n\n";
     }
     $this->status = $response['data'][0];
     $this->id = $response['data'][0]->id;
