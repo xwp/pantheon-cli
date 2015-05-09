@@ -52,7 +52,7 @@ class SiteWorkflow {
     
     if (!\Terminus\utils\result_is_multiobj($response['data']) || isset($response['data'])) {
       $response['data'] = array($response['data']);
-      echo "Coercing into an array. Why do we do this?";
+      echo "Coercing into an array. Why do we do this?\n\n";
     }
     print_r($response);
     $this->status = $response['data'][0];
