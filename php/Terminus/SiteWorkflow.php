@@ -53,7 +53,6 @@ class SiteWorkflow {
     if (!\Terminus\utils\result_is_multiobj($response['data']) || 
         (isset($response['data']) && isset($response['data']->id))) {
       $response['data'] = array($response['data']);
-      echo "Coercing into an array.\n\n";
     }
     $this->status = $response['data'][0];
     $this->id = $response['data'][0]->id;
@@ -67,7 +66,6 @@ class SiteWorkflow {
     if (!\Terminus\utils\result_is_multiobj($response['data']) || 
         (isset($response['data']) && isset($response['data']->id))) {
       $response['data'] = array( $response['data'] );
-      echo "Coercing into an array.\n\n";
     }
     $this->status = $response['data'][0];
     $this->id = $response['data'][0]->id;
