@@ -53,7 +53,7 @@ class SiteWorkflow {
     if (!\Terminus\utils\result_is_multiobj($response['data'])) {
       $response['data'] = array($response['data']);
     }
-    var_dump($response)
+    var_dump($response);
     $this->status = $response['data'][0];
     $this->id = $response['data'][0]->id;
     $this->result = $response['data'][0]->result;
