@@ -541,6 +541,9 @@ class Site_Command extends Terminus_Command {
    * [--files]
    * : Clone the files? (bool) default no
    *
+   * [--yes]
+   * : Just do it; no confirmation.
+   *
    * @subcommand clone-env
    */
    public function clone_env($args, $assoc_args) {
@@ -565,12 +568,14 @@ class Site_Command extends Terminus_Command {
        \Terminus::error('You must specify something to clone using the the --db and --files flags');
      }
 
-     $confirm = sprintf("Are you sure?\n\tClone from %s to %s\n\tInclude: %s\n", strtoupper($from_env), strtoupper($to_env), $append);
-     \Terminus::confirm($confirm);
+     if ( !$this->envExists($site_id, $to_env) ) {
+       \Terminus::error("The %s environment has not been created yet. run `terminus site create-env [--site=<env>]`", $to_env);
+     }
 
-      if ( !$this->envExists($site_id, $to_env) ) {
-        \Terminus::error("The %s environment has not been created yet. run `terminus site create-env [--site=<env>]`", $to_env);
-      }
+     if (!isset($assoc_args['yes'])) {
+       $confirm = sprintf("Are you sure?\n\tClone from %s to %s\n\tInclude: %s\n", strtoupper($from_env), strtoupper($to_env), $append);
+       \Terminus::confirm($confirm);
+     }
 
      if ($db) {
        print "Cloning database ... ";
