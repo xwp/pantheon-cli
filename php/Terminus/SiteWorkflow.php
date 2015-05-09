@@ -64,7 +64,7 @@ class SiteWorkflow {
   public function refresh() {
     $response = \Terminus_Command::request('sites', $this->site->getId(), "workflows/".$this->id, 'GET');
     // we have to do this because the api sometimes returns an object and sometimes a collections
-    if (!\Terminus\utils\result_is_multiobj($response['data'])) {
+    if (!\Terminus\utils\result_is_multiobj($response['data'])  || isset($response['data'])) {
       $response['data'] = array( $response['data'] );
     }
     $this->status = $response['data'][0];
