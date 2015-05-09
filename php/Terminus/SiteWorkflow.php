@@ -50,11 +50,11 @@ class SiteWorkflow {
     }
     $response = \Terminus_Command::request('sites', $this->site->getId(), $path, $method, $data);
     
-    if (!\Terminus\utils\result_is_multiobj($response['data'])) {
-      echo "\n\nCOERCING INTO ARRAY\n\n";
+    if (!\Terminus\utils\result_is_multiobj($response['data']) || isset($response['data'])) {
       $response['data'] = array($response['data']);
+      echo "Coercing into an array. Why do we do this?";
     }
-    var_dump($response);
+    print_r($response);
     $this->status = $response['data'][0];
     $this->id = $response['data'][0]->id;
     $this->result = $response['data'][0]->result;
